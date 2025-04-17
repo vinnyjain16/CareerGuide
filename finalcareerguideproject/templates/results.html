@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessment Results - CareerGuide{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow mb-5">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h4 mb-0">Your Assessment Results</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center mb-5">
+                            <div class="col-md-5">
+                                <h4 class="mb-3">Your Aptitude Profile</h4>
+                                <div style="height: 300px;">
+                                    <canvas id="aptitudeChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <h4 class="mb-3">Aptitude Breakdown</h4>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-bold">Analytical</span>
+                                        <span>{{ result.analytical_score }}/5</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ (result.analytical_score/5)*100 }}%; background-color: {{ '#28a745' if result.analytical_score >= 4 else ('#ffc107' if result.analytical_score >= 2.5 else '#dc3545') }};" aria-valuenow="{{ result.analytical_score }}" aria-valuemin="0" aria-valuemax="5"></div>
+                                    </div>
+                                    <small class="text-muted">Logical reasoning, problem-solving, and data analysis</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-bold">Creative</span>
+                                        <span>{{ result.creative_score }}/5</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ (result.creative_score/5)*100 }}%; background-color: {{ '#28a745' if result.creative_score >= 4 else ('#ffc107' if result.creative_score >= 2.5 else '#dc3545') }};" aria-valuenow="{{ result.creative_score }}" aria-valuemin="0" aria-valuemax="5"></div>
+                                    </div>
+                                    <small class="text-muted">Imagination, innovation, and artistic expression</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-bold">Practical</span>
+                                        <span>{{ result.practical_score }}/5</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ (result.practical_score/5)*100 }}%; background-color: {{ '#28a745' if result.practical_score >= 4 else ('#ffc107' if result.practical_score >= 2.5 else '#dc3545') }};" aria-valuenow="{{ result.practical_score }}" aria-valuemin="0" aria-valuemax="5"></div>
+                                    </div>
+                                    <small class="text-muted">Hands-on skills, technical abilities, and applied work</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-bold">Social</span>
+                                        <span>{{ result.social_score }}/5</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ (result.social_score/5)*100 }}%; background-color: {{ '#28a745' if result.social_score >= 4 else ('#ffc107' if result.social_score >= 2.5 else '#dc3545') }};" aria-valuenow="{{ result.social_score }}" aria-valuemin="0" aria-valuemax="5"></div>
+                                    </div>
+                                    <small class="text-muted">Communication, empathy, and interpersonal skills</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-bold">Conventional</span>
+                                        <span>{{ result.conventional_score }}/5</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ (result.conventional_score/5)*100 }}%; background-color: {{ '#28a745' if result.conventional_score >= 4 else ('#ffc107' if result.conventional_score >= 2.5 else '#dc3545') }};" aria-valuenow="{{ result.conventional_score }}" aria-valuemin="0" aria-valuemax="5"></div>
+                                    </div>
+                                    <small class="text-muted">Organization, attention to detail, and following procedures</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-bold">Enterprising</span>
+                                        <span>{{ result.enterprising_score }}/5</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ (result.enterprising_score/5)*100 }}%; background-color: {{ '#28a745' if result.enterprising_score >= 4 else ('#ffc107' if result.enterprising_score >= 2.5 else '#dc3545') }};" aria-valuenow="{{ result.enterprising_score }}" aria-valuemin="0" aria-valuemax="5"></div>
+                                    </div>
+                                    <small class="text-muted">Leadership, persuasion, and entrepreneurial abilities</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h3 class="mb-4">Your Career Recommendations</h3>
+                                <p>Based on your aptitude profile, we've identified these careers as potential matches for you. Explore each one to learn more.</p>
+                                
+                                <div class="row mt-4">
+                                    {% for recommendation in recommended_careers %}
+                                        <div class="col-lg-6 mb-4">
+                                            <div class="card h-100 recommendation-card">
+                                                <div class="card-body">
+                                                    <span class="match-score">{{ recommendation['match_score'] }}%</span>
+                                                    <h4 class="card-title mb-1">{{ recommendation['career'].title }}</h4>
+                                                    <span class="badge bg-primary">{{ recommendation['career'].category }}</span>
+                                                    <p class="card-text mt-3">{{ recommendation['career'].description[:150] }}...</p>
+                                                    
+                                                    <div class="mt-3">
+                                                        <strong>Key Aptitudes:</strong>
+                                                        <div class="d-flex flex-wrap gap-2 mt-2">
+                                                            {% set relevance = recommendation['career'].get_relevance_scores() %}
+                                                            {% for aptitude, score in relevance.items() %}
+                                                                {% if score >= 3.5 %}
+                                                                    <span class="badge rounded-pill" style="background-color: rgba(74, 137, 220, {{ score/5 }});">
+                                                                        {{ aptitude|capitalize }}
+                                                                    </span>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer bg-white">
+                                                    <a href="{{ url_for('career_details', career_id=recommendation['career'].id) }}" class="btn btn-primary">
+                                                        Learn More
+                                                    </a>
+                                                    
+                                                    {% set saved = recommendation['career'].saved_by|selectattr('user_id', 'equalto', current_user.id)|list %}
+                                                    {% if saved|length == 0 %}
+                                                        <form action="{{ url_for('save_career', career_id=recommendation['career'].id) }}" method="POST" class="d-inline">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <button type="submit" class="btn btn-outline-primary ms-2">
+                                                                <i class="far fa-bookmark me-1"></i> Save
+                                                            </button>
+                                                        </form>
+                                                    {% else %}
+                                                        <form action="{{ url_for('remove_saved_career', career_id=recommendation['career'].id) }}" method="POST" class="d-inline">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <button type="submit" class="btn btn-outline-danger ms-2">
+                                                                <i class="fas fa-bookmark me-1"></i> Unsave
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <h5><i class="fas fa-lightbulb me-2"></i>Next Steps</h5>
+                                    <p>Explore the recommended careers in detail, and consider these additional steps:</p>
+                                    <ul>
+                                        <li>Research the educational requirements for your top career choices</li>
+                                        <li>Talk to professionals working in fields you're interested in</li>
+                                        <li>Develop skills relevant to your preferred career paths</li>
+                                        <li>Ask our CareerBot for specific guidance about preparing for these careers</li>
+                                    </ul>
+                                    <div class="mt-3">
+                                        <a href="{{ url_for('chatbot') }}" class="btn btn-primary">
+                                            <i class="fas fa-robot me-2"></i>Ask CareerBot
+                                        </a>
+                                        <a href="{{ url_for('careers') }}" class="btn btn-outline-primary ms-2">
+                                            <i class="fas fa-search me-2"></i>Explore All Careers
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create radar chart for aptitude profile
+            const scores = {
+                'Analytical': {{ result.analytical_score }},
+                'Creative': {{ result.creative_score }},
+                'Practical': {{ result.practical_score }},
+                'Social': {{ result.social_score }},
+                'Conventional': {{ result.conventional_score }},
+                'Enterprising': {{ result.enterprising_score }}
+            };
+            
+            createRadarChart('aptitudeChart', scores);
+            
+            // Create match charts for each recommendation
+            {% for recommendation in recommended_careers %}
+                createMatchChart('matchChart{{ recommendation["career"].id }}', {{ recommendation["match_score"] }});
+            {% endfor %}
+        });
+    </script>
+{% endblock %}

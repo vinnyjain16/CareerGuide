@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Assessment - CareerGuide{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h4 mb-0">Career Aptitude Assessment</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <p>This assessment will help identify your strengths, interests, and aptitudes to recommend suitable career paths. Answer each question honestly - there are no right or wrong answers.</p>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> The assessment takes about 10-15 minutes to complete. You'll need to answer all questions to get your personalized results.
+                            </div>
+                            
+                            <div class="progress mb-3">
+                                <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                            </div>
+                        </div>
+                        
+                        <form id="assessmentForm" method="POST" action="{{ url_for('assessment') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
+                            {% for question in questions %}
+                                <div id="question-{{ question.id }}" class="question-section">
+                                    <h5 class="question-text">{{ loop.index }}. {{ question.text }}</h5>
+                                    
+                                    <div class="options">
+                                        {% for option in question.options %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="q{{ question.id }}" id="q{{ question.id }}_{{ option.value }}" value="{{ option.value }}">
+                                                <label class="option-label" for="q{{ question.id }}_{{ option.value }}">
+                                                    {{ option.text }}
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        {% if not loop.first %}
+                                            <button type="button" class="btn btn-outline-secondary prev-question-btn">
+                                                <i class="fas fa-arrow-left me-2"></i>Previous
+                                            </button>
+                                        {% else %}
+                                            <div></div>
+                                        {% endif %}
+                                        
+                                        {% if not loop.last %}
+                                            <button type="button" class="btn btn-primary next-question-btn">
+                                                Next<i class="fas fa-arrow-right ms-2"></i>
+                                            </button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-success">
+                                                Submit Assessment
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-link">Cancel and return to dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/assessment.js') }}"></script>
+{% endblock %}

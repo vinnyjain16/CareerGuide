@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - CareerGuide{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .no-assessment {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 3rem;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="mb-0">Welcome, {{ current_user.username }}!</h1>
+                <p class="text-muted">Grade: {{ current_user.grade }}</p>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                {% if not assessment_result %}
+                    <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+                        <i class="fas fa-clipboard-list me-2"></i>Take Assessment
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('assessment') }}" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-sync-alt me-2"></i>Retake Assessment
+                    </a>
+                    <a href="{{ url_for('results', result_id=assessment_result.id) }}" class="btn btn-primary">
+                        <i class="fas fa-chart-pie me-2"></i>View Results
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Assessment Summary Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-radar me-2"></i>Your Aptitude Profile
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if assessment_result %}
+                            <canvas id="aptitudeChart" width="400" height="300"></canvas>
+                            <div class="mt-3">
+                                <p class="mb-1 fw-bold">Highest Aptitudes:</p>
+                                <ul>
+                                    {% set scores = assessment_result.get_scores_dict() %}
+                                    {% set sorted_scores = scores.items()|sort(reverse=True, attribute='1') %}
+                                    {% for category, score in sorted_scores[:3] %}
+                                        <li>{{ category|capitalize }}: {{ score }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% else %}
+                            <div class="no-assessment">
+                                <i class="fas fa-clipboard-list fa-3x mb-3 text-muted"></i>
+                                <h5>No Assessment Taken Yet</h5>
+                                <p class="text-muted">Take the assessment to discover your aptitude profile.</p>
+                                <a href="{{ url_for('assessment') }}" class="btn btn-primary">Start Assessment</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Career Recommendations Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-star me-2"></i>Top Career Recommendations
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if recommended_careers %}
+                            <div class="list-group">
+                                {% for recommendation in recommended_careers %}
+                                    <a href="{{ url_for('career_details', career_id=recommendation['career'].id) }}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <h6 class="mb-1">{{ recommendation['career'].title }}</h6>
+                                            <span class="badge bg-primary rounded-pill">{{ recommendation['match_score'] }}%</span>
+                                        </div>
+                                        <small class="text-muted">{{ recommendation['career'].category }}</small>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-3 text-center">
+                                <a href="{{ url_for('careers') }}" class="btn btn-outline-primary btn-sm">Explore All Careers</a>
+                            </div>
+                        {% else %}
+                            <div class="no-assessment">
+                                <i class="fas fa-compass fa-3x mb-3 text-muted"></i>
+                                <h5>No Recommendations Yet</h5>
+                                <p class="text-muted">Take the assessment to get personalized career recommendations.</p>
+                                {% if not assessment_result %}
+                                    <a href="{{ url_for('assessment') }}" class="btn btn-primary">Start Assessment</a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Saved Careers Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-bookmark me-2"></i>Saved Careers
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if saved_careers %}
+                            <div class="list-group">
+                                {% for career in saved_careers %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a href="{{ url_for('career_details', career_id=career.id) }}" class="text-decoration-none">
+                                                <h6 class="mb-1">{{ career.title }}</h6>
+                                            </a>
+                                            <form action="{{ url_for('remove_saved_career', career_id=career.id) }}" method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <small class="text-muted">{{ career.category }}</small>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="no-assessment">
+                                <i class="fas fa-bookmark fa-3x mb-3 text-muted"></i>
+                                <h5>No Saved Careers</h5>
+                                <p class="text-muted">Save careers you're interested in for quick access.</p>
+                                <a href="{{ url_for('careers') }}" class="btn btn-primary">Explore Careers</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-2">
+            <!-- Quick Links Card -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-bolt me-2"></i>Quick Actions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <a href="{{ url_for('assessment') }}" class="text-decoration-none">
+                                    <div class="card bg-light border-0 p-3">
+                                        <i class="fas fa-clipboard-list fa-2x mb-2 text-primary"></i>
+                                        <h6>Take Assessment</h6>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <a href="{{ url_for('careers') }}" class="text-decoration-none">
+                                    <div class="card bg-light border-0 p-3">
+                                        <i class="fas fa-search fa-2x mb-2 text-primary"></i>
+                                        <h6>Explore Careers</h6>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3 mb-md-0">
+                                <a href="{{ url_for('chatbot') }}" class="text-decoration-none">
+                                    <div class="card bg-light border-0 p-3">
+                                        <i class="fas fa-robot fa-2x mb-2 text-primary"></i>
+                                        <h6>Ask CareerBot</h6>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{{ url_for('profile') }}" class="text-decoration-none">
+                                    <div class="card bg-light border-0 p-3">
+                                        <i class="fas fa-user-circle fa-2x mb-2 text-primary"></i>
+                                        <h6>My Profile</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+    {% if assessment_result %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create radar chart for aptitude profile
+            const scores = {
+                'Analytical': {{ assessment_result.analytical_score }},
+                'Creative': {{ assessment_result.creative_score }},
+                'Practical': {{ assessment_result.practical_score }},
+                'Social': {{ assessment_result.social_score }},
+                'Conventional': {{ assessment_result.conventional_score }},
+                'Enterprising': {{ assessment_result.enterprising_score }}
+            };
+            
+            createRadarChart('aptitudeChart', scores);
+        });
+    </script>
+    {% endif %}
+{% endblock %}

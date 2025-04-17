@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}CareerBot - AI Career Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        height: 70vh;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .chat-messages {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .message {
+        display: flex;
+        margin-bottom: 1rem;
+    }
+    
+    .user-message {
+        flex-direction: row-reverse;
+    }
+    
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 0.5rem;
+    }
+    
+    .user-message .message-avatar {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .bot-message .message-avatar {
+        background-color: var(--accent-color);
+        color: white;
+    }
+    
+    .message-content {
+        max-width: 70%;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .user-message .message-content {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+    }
+    
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        margin: 0 3px;
+        border-radius: 50%;
+        background-color: #adb5bd;
+        animation: typing 1.5s infinite;
+    }
+    
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0);
+            opacity: 0.6;
+        }
+        30% {
+            transform: translateY(-5px);
+            opacity: 1;
+        }
+    }
+    
+    .suggested-questions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .suggested-question {
+        cursor: pointer;
+        padding: 0.5rem 1rem;
+        background-color: #e9ecef;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        transition: background-color 0.2s ease;
+    }
+    
+    .suggested-question:hover {
+        background-color: #dee2e6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-robot fa-2x"></i>
+                            </div>
+                            <div>
+                                <h2 class="h4 mb-0">CareerBot</h2>
+                                <p class="mb-0">Your AI Career Assistant</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chat-container">
+                            <div id="chat-messages" class="chat-messages">
+                                <div class="message bot-message">
+                                    <div class="message-avatar">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <div class="message-content">
+                                        <p>Hi there! I'm CareerBot, your AI career assistant. How can I help you today?</p>
+                                        <p>You can ask me questions about different careers, educational paths, or specific guidance related to your interests and aptitudes.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <form id="chat-form">
+                                <div class="input-group">
+                                    <input type="text" id="user-input" class="form-control" placeholder="Type your question here..." required>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div class="suggested-questions mt-3">
+                                <h6 class="w-100 mb-2">Suggested Questions:</h6>
+                                <span class="suggested-question">How do I choose the right career?</span>
+                                <span class="suggested-question">What should I do after 12th grade?</span>
+                                <span class="suggested-question">What is data science?</span>
+                                <span class="suggested-question">Tell me about machine learning</span>
+                                <span class="suggested-question">What programming languages should I learn?</span>
+                                <span class="suggested-question">How can I prepare for a career while in high school?</span>
+                                <span class="suggested-question">How accurate are career assessments?</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">About CareerBot</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>CareerBot is designed to provide you with personalized career guidance and information. Here's how you can use it effectively:</p>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-question-circle me-2 text-primary"></i>Ask about specific careers</h6>
+                                    <p class="text-muted small">Example: "Tell me about being a data scientist" or "What does a doctor do?"</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-graduation-cap me-2 text-primary"></i>Educational pathway guidance</h6>
+                                    <p class="text-muted small">Example: "What should I study to become a graphic designer?" or "What education do I need for finance?"</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-lightbulb me-2 text-primary"></i>Learn about trending fields</h6>
+                                    <p class="text-muted small">Example: "What is data science?" or "Tell me about machine learning and AI"</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-tools me-2 text-primary"></i>Skills development advice</h6>
+                                    <p class="text-muted small">Example: "What programming languages should I learn?" or "How can I prepare for a career in high school?"</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-money-bill me-2 text-primary"></i>Career salary information</h6>
+                                    <p class="text-muted small">Example: "How much do data scientists earn?" or "What's the salary for teachers?"</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-chart-line me-2 text-primary"></i>Job outlook insights</h6>
+                                    <p class="text-muted small">Example: "What's the future outlook for financial analysts?" or "Is software engineering in demand?"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% endblock %}

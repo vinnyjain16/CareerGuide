@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}CareerGuide - Discover Your Perfect Career Path{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="hero-title">Find Your Perfect Career Path</h1>
+                    <p class="hero-subtitle">Take our comprehensive assessment to discover careers that match your unique aptitudes and interests.</p>
+                    {% if current_user.is_authenticated and not current_user.is_admin %}
+                        <div class="d-flex gap-3">
+                            <a href="{{ url_for('assessment') }}" class="btn btn-light btn-lg">Take Assessment</a>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg">View Dashboard</a>
+                        </div>
+                    {% else %}
+                        <div class="d-flex gap-3">
+                            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">Get Started</a>
+                            <a href="{{ url_for('careers') }}" class="btn btn-outline-light btn-lg">Explore Careers</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <svg class="img-fluid" width="600" height="400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+                        <rect width="100%" height="100%" fill="none"/>
+                        <g>
+                            <path d="M178.9,154.2c-2.9-21.8-18.3-39.6-39.4-45.2c-21.1-5.6-44.2,2.1-57.6,19.4" fill="none" stroke="#ffffff" stroke-miterlimit="10" stroke-width="4"/>
+                            <path d="M421.1,154.2c2.9-21.8,18.3-39.6,39.4-45.2c21.1-5.6,44.2,2.1,57.6,19.4" fill="none" stroke="#ffffff" stroke-miterlimit="10" stroke-width="4"/>
+                            <rect x="200" y="80" width="200" height="240" rx="20" fill="#ffffff" opacity="0.3"/>
+                            <rect x="220" y="120" width="160" height="20" rx="10" fill="#ffffff"/>
+                            <rect x="220" y="160" width="160" height="20" rx="10" fill="#ffffff"/>
+                            <rect x="220" y="200" width="160" height="20" rx="10" fill="#ffffff"/>
+                            <rect x="220" y="240" width="160" height="20" rx="10" fill="#ffffff"/>
+                            <rect x="220" y="280" width="80" height="20" rx="10" fill="#ffffff"/>
+                            <circle cx="300" cy="60" r="30" fill="#ffffff" opacity="0.5"/>
+                            <line x1="300" y1="30" x2="300" y2="90" stroke="#ffffff" stroke-miterlimit="10" stroke-width="4"/>
+                            <line x1="270" y1="60" x2="330" y2="60" stroke="#ffffff" stroke-miterlimit="10" stroke-width="4"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">How CareerGuide Helps You</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>Personalized Assessment</h3>
+                        <p>Take our scientific assessment to discover your unique aptitudes, interests, and strengths. Our assessment is designed specifically for students in grades 10-12.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <i class="fas fa-compass"></i>
+                        <h3>Career Recommendations</h3>
+                        <p>Get personalized career recommendations based on your assessment results. Explore detailed information about each career path and find the perfect match for you.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <i class="fas fa-robot"></i>
+                        <h3>AI Career Assistant</h3>
+                        <p>Chat with our AI-powered CareerBot to get answers to your career-related questions, advice on education paths, and guidance on skill development.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">How It Works</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="d-flex flex-column gap-4">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="me-4">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-weight: 700;">1</div>
+                                </div>
+                                <div>
+                                    <h4 class="card-title">Create Your Account</h4>
+                                    <p class="card-text mb-0">Register with your email to get started. It's free and only takes a minute.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="me-4">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-weight: 700;">2</div>
+                                </div>
+                                <div>
+                                    <h4 class="card-title">Take the Assessment</h4>
+                                    <p class="card-text mb-0">Complete our comprehensive assessment to identify your aptitudes, interests, and strengths.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="me-4">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-weight: 700;">3</div>
+                                </div>
+                                <div>
+                                    <h4 class="card-title">Get Personalized Recommendations</h4>
+                                    <p class="card-text mb-0">Review your personalized career recommendations and explore detailed information about each option.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="me-4">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-weight: 700;">4</div>
+                                </div>
+                                <div>
+                                    <h4 class="card-title">Ask Questions & Save Favorites</h4>
+                                    <p class="card-text mb-0">Chat with our CareerBot for specific guidance and save careers you're interested in for future reference.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        {% if not current_user.is_authenticated %}
+                            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Get Started Now</a>
+                        {% else %}
+                            <a href="{{ url_for('assessment') }}" class="btn btn-primary btn-lg">Take Assessment</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">What Students Say</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="card-text">"CareerGuide helped me discover my passion for engineering. The assessment perfectly matched my interests and skills, and now I'm confidently preparing for my future career in mechanical engineering."</p>
+                            <div class="d-flex align-items-center mt-3">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0">Rahul K.</h5>
+                                    <small class="text-muted">12th Grade Student</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="card-text">"I was feeling lost about my future, but after taking the assessment, I gained clarity about my strengths and discovered careers I'd never considered before. The CareerBot answered all my questions too!"</p>
+                            <div class="d-flex align-items-center mt-3">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0">Priya M.</h5>
+                                    <small class="text-muted">11th Grade Student</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-3 text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <p class="card-text">"My parents wanted me to be a doctor, but the assessment showed my strengths in creative fields. Now they understand why I'm pursuing design, and I feel more confident in my choice."</p>
+                            <div class="d-flex align-items-center mt-3">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0">Aditya S.</h5>
+                                    <small class="text-muted">10th Grade Student</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-5 bg-primary text-white">
+        <div class="container text-center">
+            <h2 class="mb-4">Ready to discover your perfect career path?</h2>
+            <p class="lead mb-4">Join thousands of students who have found their career direction with CareerGuide.</p>
+            {% if current_user.is_authenticated and not current_user.is_admin %}
+                <a href="{{ url_for('assessment') }}" class="btn btn-light btn-lg me-3">Take Assessment</a>
+                <a href="{{ url_for('chatbot') }}" class="btn btn-outline-light btn-lg">Ask CareerBot</a>
+            {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">Create Free Account</a>
+                <a href="{{ url_for('careers') }}" class="btn btn-outline-light btn-lg">Explore Careers</a>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

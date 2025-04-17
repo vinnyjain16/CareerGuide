@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessment Reports - Admin{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="admin-header">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="mb-0">Assessment Reports</h1>
+                    <p class="mb-0">View all student assessment results</p>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-light">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow mt-4">
+            <div class="card-header bg-white">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h4 class="mb-0">Assessment Results</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" id="assessmentSearch" class="form-control" placeholder="Search assessments...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="assessmentsTable">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Student</th>
+                                <th>Grade</th>
+                                <th>Analytical</th>
+                                <th>Creative</th>
+                                <th>Practical</th>
+                                <th>Social</th>
+                                <th>Conventional</th>
+                                <th>Enterprising</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assessment, user in assessments %}
+                                <tr>
+                                    <td>{{ assessment.created_at.strftime('%b %d, %Y') }}</td>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.grade }}</td>
+                                    <td>{{ assessment.analytical_score }}</td>
+                                    <td>{{ assessment.creative_score }}</td>
+                                    <td>{{ assessment.practical_score }}</td>
+                                    <td>{{ assessment.social_score }}</td>
+                                    <td>{{ assessment.conventional_score }}</td>
+                                    <td>{{ assessment.enterprising_score }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin_view_assessment', result_id=assessment.id) }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0">Showing {{ assessments|length }} assessments</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination mb-0 justify-content-md-end">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow mt-4">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Assessment Analytics</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="text-center mb-3">Average Aptitude Scores</h5>
+                                <canvas id="averageScoresChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="text-center mb-3">Assessment Trend</h5>
+                                <canvas id="assessmentTrendChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Assessment search functionality
+            document.getElementById('assessmentSearch').addEventListener('keyup', function() {
+                const searchValue = this.value.toLowerCase();
+                const table = document.getElementById('assessmentsTable');
+                const rows = table.getElementsByTagName('tr');
+                
+                for (let i = 1; i < rows.length; i++) {
+                    let found = false;
+                    const cells = rows[i].getElementsByTagName('td');
+                    
+                    for (let j = 0; j < cells.length; j++) {
+                        if (cells[j].textContent.toLowerCase().indexOf(searchValue) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (found) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            });
+            
+            // Calculate average aptitude scores from the assessments
+            let totalAnalytical = 0, totalCreative = 0, totalPractical = 0;
+            let totalSocial = 0, totalConventional = 0, totalEnterprising = 0;
+            let count = {{ assessments|length }};
+            
+            {% for assessment, user in assessments %}
+                totalAnalytical += {{ assessment.analytical_score }};
+                totalCreative += {{ assessment.creative_score }};
+                totalPractical += {{ assessment.practical_score }};
+                totalSocial += {{ assessment.social_score }};
+                totalConventional += {{ assessment.conventional_score }};
+                totalEnterprising += {{ assessment.enterprising_score }};
+            {% endfor %}
+            
+            // Average Aptitude Scores Chart
+            const avgScoresCtx = document.getElementById('averageScoresChart').getContext('2d');
+            new Chart(avgScoresCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Analytical', 'Creative', 'Practical', 'Social', 'Conventional', 'Enterprising'],
+                    datasets: [{
+                        label: 'Average Score',
+                        data: [
+                            count > 0 ? (totalAnalytical / count).toFixed(2) : 0,
+                            count > 0 ? (totalCreative / count).toFixed(2) : 0,
+                            count > 0 ? (totalPractical / count).toFixed(2) : 0,
+                            count > 0 ? (totalSocial / count).toFixed(2) : 0,
+                            count > 0 ? (totalConventional / count).toFixed(2) : 0,
+                            count > 0 ? (totalEnterprising / count).toFixed(2) : 0
+                        ],
+                        backgroundColor: [
+                            'rgba(74, 137, 220, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 205, 86, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(74, 137, 220, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 205, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5
+                        }
+                    }
+                }
+            });
+            
+            // Assessment Trend Chart (Simplified for demo)
+            const trendCtx = document.getElementById('assessmentTrendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Assessments',
+                        data: [4, 7, 10, 12, 15, 18],
+                        borderColor: '#4a89dc',
+                        backgroundColor: 'rgba(74, 137, 220, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

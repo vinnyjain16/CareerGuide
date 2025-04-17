@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - CareerGuide{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="admin-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-0">Admin Dashboard</h1>
+                    <p class="mb-0">Welcome, {{ current_user.username }}! Monitor student activities and platform usage here.</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-light me-2">
+                        <i class="fas fa-users me-2"></i>Manage Users
+                    </a>
+                    <a href="{{ url_for('admin_assessments') }}" class="btn btn-light">
+                        <i class="fas fa-clipboard-list me-2"></i>View Assessments
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2 text-primary"></i>
+                        <h3 class="mb-0">{{ total_users }}</h3>
+                        <p class="text-muted mb-0">Total Students</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clipboard-check fa-2x mb-2 text-success"></i>
+                        <h3 class="mb-0">{{ total_assessments }}</h3>
+                        <p class="text-muted mb-0">Assessments Completed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4 mb-md-0">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-graduate fa-2x mb-2 text-warning"></i>
+                        <h3 class="mb-0">{{ grade_stats.get('10th', 0) + grade_stats.get('11th', 0) + grade_stats.get('12th', 0) }}</h3>
+                        <p class="text-muted mb-0">Active Users</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line fa-2x mb-2 text-info"></i>
+                        <h3 class="mb-0">{{ (total_assessments / total_users)|round(1) if total_users > 0 else 0 }}</h3>
+                        <p class="text-muted mb-0">Avg. Assessments per User</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grade Distribution Chart -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card admin-dashboard-card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Assessment Distribution by Grade</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <canvas id="gradeChart" height="300"></canvas>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">10th Grade</h6>
+                                                <small class="text-muted">Assessment Count</small>
+                                            </div>
+                                            <span class="badge bg-primary">{{ grade_stats.get('10th', 0) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card mb-3">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">11th Grade</h6>
+                                                <small class="text-muted">Assessment Count</small>
+                                            </div>
+                                            <span class="badge bg-success">{{ grade_stats.get('11th', 0) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">12th Grade</h6>
+                                                <small class="text-muted">Assessment Count</small>
+                                            </div>
+                                            <span class="badge bg-warning">{{ grade_stats.get('12th', 0) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Recent Users Table -->
+            <div class="col-lg-6 mb-4">
+                <div class="card admin-dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Recent Students</h4>
+                        <a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-primary">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table admin-table mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Grade</th>
+                                        <th>Registered</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in recent_users %}
+                                        <tr>
+                                            <td>{{ user.username }}</td>
+                                            <td>{{ user.grade }}</td>
+                                            <td>{{ user.registered_at.strftime('%b %d, %Y') }}</td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Assessments Table -->
+            <div class="col-lg-6 mb-4">
+                <div class="card admin-dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Recent Assessments</h4>
+                        <a href="{{ url_for('admin_assessments') }}" class="btn btn-sm btn-primary">View All</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table admin-table mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Grade</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for assessment, user in recent_assessments %}
+                                        <tr>
+                                            <td>{{ user.username }}</td>
+                                            <td>{{ user.grade }}</td>
+                                            <td>{{ assessment.created_at.strftime('%b %d, %Y') }}</td>
+                                            <td>
+                                                <a href="{{ url_for('admin_view_assessment', result_id=assessment.id) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Grade distribution chart
+            const gradeCtx = document.getElementById('gradeChart').getContext('2d');
+            const gradeChart = new Chart(gradeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['10th Grade', '11th Grade', '12th Grade'],
+                    datasets: [{
+                        label: 'Assessments Completed',
+                        data: [
+                            {{ grade_stats.get('10th', 0) }},
+                            {{ grade_stats.get('11th', 0) }},
+                            {{ grade_stats.get('12th', 0) }}
+                        ],
+                        backgroundColor: [
+                            'rgba(74, 137, 220, 0.7)',  // Primary color
+                            'rgba(40, 167, 69, 0.7)',   // Success color
+                            'rgba(255, 193, 7, 0.7)'    // Warning color
+                        ],
+                        borderColor: [
+                            'rgba(74, 137, 220, 1)',
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(255, 193, 7, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Assessments'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Grade Level'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
